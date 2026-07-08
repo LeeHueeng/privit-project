@@ -233,6 +233,9 @@ test("passive frontend discovery maps login routes and forms in scope", async ()
     const artifact = JSON.parse(await readFile(path.join(cwd, artifactPath), "utf8"));
     assert.equal(artifact.auth_surfaces.length >= 1, true);
 
+    const initialFindings = JSON.parse(await readFile(path.join(cwd, ".aegis/findings.json"), "utf8"));
+    await writeFile(path.join(cwd, ".aegis/findings.json"), `${JSON.stringify([...initialFindings, initialFindings[0]], null, 2)}\n`, "utf8");
+
     const second = await runCliAsync(cwd, ["run", "--target", "frontend", "--mode", "passive", "--max-depth", "2", "--max-pages", "10"]);
     assert.equal(second.status, 0, second.stderr);
     const storedFindings = JSON.parse(await readFile(path.join(cwd, ".aegis/findings.json"), "utf8"));

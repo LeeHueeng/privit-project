@@ -184,12 +184,21 @@ async function appendFindings(cwd, scanId, scope, findings) {
     existing = await readJson(findingsPath);
   }
   const now = new Date().toISOString();
-  const next = [...existing];
   const normalized = [];
 
   function keyFor(finding) {
     return [scope.project, scope.environment, finding.target_type, finding.category, finding.asset, finding.title].join("|");
   }
+
+  const existingByKey = new Map();
+  for (const finding of existing) {
+    const key = keyFor(finding);
+    const previous = existingByKey.get(key);
+    if (!previous || String(finding.updated_at || finding.created_at || "") >= String(previous.updated_at || previous.created_at || "")) {
+      existingByKey.set(key, finding);
+    }
+  }
+  const next = [...existingByKey.values()];
 
   for (const finding of findings) {
     const key = keyFor(finding);
