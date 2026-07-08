@@ -240,5 +240,12 @@ test("passive frontend discovery maps login routes and forms in scope", async ()
     assert.equal(second.status, 0, second.stderr);
     const storedFindings = JSON.parse(await readFile(path.join(cwd, ".aegis/findings.json"), "utf8"));
     assert.equal(storedFindings.filter((finding) => finding.title === "Login-like form uses GET").length, 1);
+
+    const latestBeforeDryRun = JSON.parse(await readFile(path.join(cwd, ".aegis/latest-scan.json"), "utf8"));
+    const dryRun = await runCliAsync(cwd, ["run", "--target", "frontend", "--mode", "passive", "--dry-run", "--no-save-latest"]);
+    assert.equal(dryRun.status, 0, dryRun.stderr);
+    const latestAfterDryRun = JSON.parse(await readFile(path.join(cwd, ".aegis/latest-scan.json"), "utf8"));
+    assert.equal(latestAfterDryRun.scan_id, latestBeforeDryRun.scan_id);
+    assert.ok(latestAfterDryRun.discovery.routes.some((route) => route.path === "/login"));
   });
 });

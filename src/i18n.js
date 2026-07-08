@@ -40,7 +40,7 @@ const DICTIONARY = {
       "aegis catalog generate",
       "aegis docs generate [--lang all|ko-KR|ja-JP|zh-CN|en-US]",
       "aegis plan [--mode passive] [--target frontend] [--limit 100] [--manual-approval]",
-      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run]",
+      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run] [--no-save-latest]",
       "aegis findings list",
       "aegis findings show FIND-2026-000001",
       "aegis report --format markdown|html|json|sarif|junit"
@@ -58,7 +58,7 @@ const DICTIONARY = {
       "aegis catalog generate",
       "aegis docs generate [--lang all|ko-KR|ja-JP|zh-CN|en-US]",
       "aegis plan [--mode passive] [--target frontend] [--limit 100] [--manual-approval]",
-      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run]",
+      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run] [--no-save-latest]",
       "aegis findings list",
       "aegis findings show FIND-2026-000001",
       "aegis report --format markdown|html|json|sarif|junit"
@@ -76,7 +76,7 @@ const DICTIONARY = {
       "aegis catalog generate",
       "aegis docs generate [--lang all|ko-KR|ja-JP|zh-CN|en-US]",
       "aegis plan [--mode passive] [--target frontend] [--limit 100] [--manual-approval]",
-      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run]",
+      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run] [--no-save-latest]",
       "aegis findings list",
       "aegis findings show FIND-2026-000001",
       "aegis report --format markdown|html|json|sarif|junit"
@@ -94,7 +94,7 @@ const DICTIONARY = {
       "aegis catalog generate",
       "aegis docs generate [--lang all|ko-KR|ja-JP|zh-CN|en-US]",
       "aegis plan [--mode passive] [--target frontend] [--limit 100] [--manual-approval]",
-      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run]",
+      "aegis run [--mode passive] [--target frontend] [--crawl true] [--max-depth 2] [--max-pages 30] [--dry-run] [--no-save-latest]",
       "aegis findings list",
       "aegis findings show FIND-2026-000001",
       "aegis report --format markdown|html|json|sarif|junit"

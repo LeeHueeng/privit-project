@@ -281,7 +281,9 @@ export async function runPlan(cwd, options = {}) {
     findings: normalizedFindings
   };
   await writeJson(path.join(scanDir, "results.json"), result);
-  await writeJson(path.resolve(cwd, ".aegis/latest-scan.json"), result);
+  if (options.saveLatest !== false) {
+    await writeJson(path.resolve(cwd, ".aegis/latest-scan.json"), result);
+  }
   return result;
 }
 

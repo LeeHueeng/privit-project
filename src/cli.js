@@ -144,6 +144,7 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
       crawl: boolFlag(flags, "crawl", true),
       maxDepth: numberFlag(flags, "max-depth", undefined),
       maxPages: numberFlag(flags, "max-pages", undefined),
+      saveLatest: !boolFlag(flags, "no-save-latest", false),
       manualApproval: boolFlag(flags, "manual-approval", false),
       simulateConsoleError: boolFlag(flags, "simulate-console-error", false)
     }));
