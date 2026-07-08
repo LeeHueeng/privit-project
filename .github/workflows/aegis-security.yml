@@ -1,0 +1,21 @@
+name: Aegis Security
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  aegis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm test
+      - run: npm run catalog:generate
+      - run: node ./bin/aegis.js init --environment local --force
+      - run: node ./bin/aegis.js scope verify --mode passive
+      - run: node ./bin/aegis.js plan --mode ci --target ci_cd
+      - run: node ./bin/aegis.js run --mode ci --target ci_cd --dry-run
+      - run: node ./bin/aegis.js report --format sarif
