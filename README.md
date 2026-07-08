@@ -2,6 +2,25 @@
 
 Aegis CLI is an MVP scaffold for authorized, non-destructive security verification. It follows the attached planning document by enforcing scope first, selecting checks from a safe catalog, redacting sensitive data, and producing reports.
 
+## Languages
+
+Aegis supports Korean, Japanese, Chinese, and English.
+
+```bash
+npm run aegis -- help --lang ko-KR
+npm run aegis -- help --lang ja-JP
+npm run aegis -- help --lang zh-CN
+npm run aegis -- help --lang en-US
+AEGIS_LANG=ko-KR npm run aegis -- help
+```
+
+Localized docs are generated under:
+
+- `docs/ko-KR/`
+- `docs/ja-JP/`
+- `docs/zh-CN/`
+- `docs/en-US/`
+
 ## Quick Start
 
 ```bash
@@ -28,7 +47,11 @@ npm run aegis -- report --format html
 aegis init
 aegis scope verify
 aegis catalog generate
-aegis docs generate
+aegis docs generate --lang all
+aegis docs generate --lang ko-KR
+aegis docs generate --lang ja-JP
+aegis docs generate --lang zh-CN
+aegis docs generate --lang en-US
 aegis plan --mode passive --target frontend
 aegis run --mode passive --target frontend --dry-run
 aegis findings list
@@ -46,5 +69,5 @@ aegis report --format sarif
 - `catalog/security-checks.jsonl`: 2,430 generated safe verification checks.
 - `docs/AGENT_SECURITY_CHECKS.md`: agent and adapter operating guide.
 - `docs/HUMAN_SECURITY_GUIDE.md`: human usage guide.
+- `docs/{ko-KR,ja-JP,zh-CN,en-US}/`: localized agent and human guides.
 - `.aegis/`: local scan results, artifacts, findings, and reports.
-

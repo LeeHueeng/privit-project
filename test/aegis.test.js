@@ -70,6 +70,41 @@ test("redaction masks headers, tokens, and emails", () => {
   assert.equal(value.nested.owner, "[REDACTED_EMAIL]");
 });
 
+test("help supports Korean, Japanese, Chinese, and English", async () => {
+  const cwd = await tempWorkspace();
+  const samples = [
+    [["help", "--lang", "ko-KR"], /사용법/],
+    [["help", "--lang", "ja-JP"], /使い方/],
+    [["help", "--lang", "zh-CN"], /用法/],
+    [["help", "--lang", "en-US"], /Usage/]
+  ];
+
+  for (const [args, expected] of samples) {
+    const result = runCli(cwd, args);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, expected);
+  }
+});
+
+test("docs generate writes localized guides", async () => {
+  const cwd = await tempWorkspace();
+  const result = runCli(cwd, ["docs", "generate", "--lang", "all"]);
+  assert.equal(result.status, 0, result.stderr);
+  const output = JSON.parse(result.stdout);
+  assert.deepEqual(output.supported_locales, ["ko-KR", "ja-JP", "zh-CN", "en-US"]);
+
+  const files = [
+    ["docs/ko-KR/HUMAN_SECURITY_GUIDE.md", /사용자 보안 가이드/],
+    ["docs/ja-JP/HUMAN_SECURITY_GUIDE.md", /ユーザーセキュリティガイド/],
+    ["docs/zh-CN/HUMAN_SECURITY_GUIDE.md", /用户安全指南/],
+    ["docs/en-US/HUMAN_SECURITY_GUIDE.md", /Human Security Guide/]
+  ];
+
+  for (const [file, expected] of files) {
+    assert.match(await readFile(path.join(cwd, file), "utf8"), expected);
+  }
+});
+
 test("simulated frontend console error stores log and screenshot artifacts", async () => {
   const cwd = await tempWorkspace();
   const init = runCli(cwd, ["init"]);

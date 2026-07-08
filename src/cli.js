@@ -3,6 +3,7 @@ import { VERSION, createDefaultPolicy, createDefaultScope } from "./config.js";
 import { boolFlag, numberFlag, parseArgs } from "./args.js";
 import { ensureCatalog, writeCatalog } from "./catalog.js";
 import { writeDocs } from "./docs.js";
+import { resolveLocale, t, usage } from "./i18n.js";
 import { fileExists, readJson, writeJson } from "./io.js";
 import { createPlan } from "./planner.js";
 import { generateReport } from "./reports.js";
@@ -17,23 +18,7 @@ function print(value) {
   console.log(JSON.stringify(value, null, 2));
 }
 
-function usage() {
-  return `Aegis CLI ${VERSION}
-
-Usage:
-  aegis init [--project name] [--environment local] [--force]
-  aegis scope verify [--mode passive] [--target frontend] [--url https://example.com]
-  aegis catalog generate
-  aegis docs generate
-  aegis plan [--mode passive] [--target frontend] [--limit 100] [--manual-approval]
-  aegis run [--mode passive] [--target frontend] [--dry-run] [--simulate-console-error]
-  aegis findings list
-  aegis findings show FIND-2026-000001
-  aegis report --format markdown|html|json|sarif|junit
-`;
-}
-
-async function initProject(cwd, flags) {
+async function initProject(cwd, flags, locale) {
   const force = boolFlag(flags, "force", false);
   const projectName = flags.project || path.basename(cwd).replace(/\s+/g, "-") || "aegis-project";
   const environment = flags.environment || "local";
@@ -54,7 +39,7 @@ async function initProject(cwd, flags) {
   await writeOnce("aegis.auth.json", {
     version: "0.1.0",
     auth_profiles: [],
-    note: "Store test-account metadata only. Do not store production credentials."
+    note: t(locale, "authNote")
   });
   await writeOnce("aegis.plan.json", {
     version: "0.1.0",
@@ -64,15 +49,15 @@ async function initProject(cwd, flags) {
     target: "frontend",
     selected_checks: []
   });
-  const docs = await writeDocs(cwd);
+  const docs = await writeDocs(cwd, { locale: flags.lang || "all", defaultLocale: locale });
   const catalog = await ensureCatalog(cwd);
-  return { initialized: true, outputs, docs: docs.files, catalog: catalog.file };
+  return { initialized: true, locale, outputs, docs: docs.files, catalog: catalog.file };
 }
 
-async function addAuthRole(cwd, flags) {
+async function addAuthRole(cwd, flags, locale) {
   const role = flags.role;
   if (!role) {
-    throw new Error("auth add requires --role");
+    throw new Error(t(locale, "authRoleRequired"));
   }
   const authPath = path.resolve(cwd, "aegis.auth.json");
   const auth = fileExists(authPath)
@@ -92,9 +77,10 @@ async function addAuthRole(cwd, flags) {
 export async function main(argv = process.argv, cwd = process.cwd()) {
   const { positionals, flags } = parseArgs(argv);
   const [command, subcommand, third] = positionals;
+  const locale = resolveLocale(flags);
 
   if (!command || command === "help" || flags.help) {
-    print(usage());
+    print(usage(locale, VERSION));
     return;
   }
 
@@ -104,7 +90,7 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
   }
 
   if (command === "init") {
-    print(await initProject(cwd, flags));
+    print(await initProject(cwd, flags, locale));
     return;
   }
 
@@ -120,7 +106,7 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
   }
 
   if (command === "auth" && subcommand === "add") {
-    print(await addAuthRole(cwd, flags));
+    print(await addAuthRole(cwd, flags, locale));
     return;
   }
 
@@ -130,7 +116,7 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
   }
 
   if (command === "docs" && subcommand === "generate") {
-    print(await writeDocs(cwd));
+    print(await writeDocs(cwd, { locale: flags.lang || "all", defaultLocale: locale }));
     return;
   }
 
@@ -169,7 +155,7 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
   if (command === "findings" && subcommand === "show") {
     const finding = await showFinding(cwd, third);
     if (!finding) {
-      const error = new Error(`Finding not found: ${third}`);
+      const error = new Error(`${t(locale, "findingNotFound")}: ${third}`);
       error.exitCode = 2;
       throw error;
     }
@@ -185,6 +171,5 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
     return;
   }
 
-  throw new Error(`Unknown command. Run "aegis help" for usage.`);
+  throw new Error(t(locale, "unknownCommand"));
 }
-

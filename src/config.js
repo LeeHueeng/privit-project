@@ -1,5 +1,17 @@
 export const VERSION = "0.1.0";
 
+export const SUPPORTED_LANGUAGE_CONFIG = {
+  default_locale: "ko-KR",
+  fallback_locale: "en-US",
+  supported_locales: ["ko-KR", "ja-JP", "zh-CN", "en-US"],
+  aliases: {
+    korean: "ko-KR",
+    japanese: "ja-JP",
+    chinese: "zh-CN",
+    english: "en-US"
+  }
+};
+
 export const EXECUTION_MODES = {
   passive: {
     safeForProduction: true,
@@ -320,6 +332,7 @@ export function createDefaultPolicy() {
     tool_allowlist_required: true,
     secret_redaction_before_llm: true,
     human_approval_for_high_risk_actions: true,
+    localization: SUPPORTED_LANGUAGE_CONFIG,
     disallowed_capabilities: [
       "unauthorized_target_testing",
       "brute_force_login",
@@ -335,4 +348,3 @@ export function createDefaultPolicy() {
     allowed_tool_adapters: Object.keys(TOOL_ADAPTERS)
   };
 }
-
