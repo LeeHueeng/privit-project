@@ -79,13 +79,13 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
   const [command, subcommand, third] = positionals;
   const locale = resolveLocale(flags);
 
-  if (!command || command === "help" || flags.help) {
-    print(usage(locale, VERSION));
+  if (flags.version || command === "--version" || command === "version") {
+    print(VERSION);
     return;
   }
 
-  if (command === "--version" || command === "version") {
-    print(VERSION);
+  if (!command || command === "help" || flags.help) {
+    print(usage(locale, VERSION));
     return;
   }
 

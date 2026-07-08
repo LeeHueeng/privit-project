@@ -86,6 +86,13 @@ test("help supports Korean, Japanese, Chinese, and English", async () => {
   }
 });
 
+test("version flag prints the CLI version", async () => {
+  const cwd = await tempWorkspace();
+  const result = runCli(cwd, ["--version"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout.trim(), "0.1.0");
+});
+
 test("docs generate writes localized guides", async () => {
   const cwd = await tempWorkspace();
   const result = runCli(cwd, ["docs", "generate", "--lang", "all"]);
