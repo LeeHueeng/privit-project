@@ -5,6 +5,7 @@ import { fileExists, ensureDir, readJson, writeJson, writeText } from "./io.js";
 import { redact } from "./redaction.js";
 import { assertModeAllowed, assertUrlInScope, loadScope, targetBaseUrl, verifyScope } from "./scope.js";
 import { createPlan, loadPlan } from "./planner.js";
+import { discoverFrontendSite } from "./discovery.js";
 
 const TRANSPARENT_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
 
@@ -82,6 +83,7 @@ function simulatedConsoleFinding(scope, cwd, scanDir) {
 async function runBuiltInChecks(cwd, scope, plan, scanDir, options) {
   const findings = [];
   const observations = [];
+  let discovery = null;
 
   observations.push({
     check: "scope_guard",
@@ -102,7 +104,7 @@ async function runBuiltInChecks(cwd, scope, plan, scanDir, options) {
       status: "planned_only",
       detail: "No target requests or external tool adapters were executed."
     });
-    return { findings, observations };
+    return { findings, observations, discovery };
   }
 
   if ((plan.target === "frontend" || plan.target === "all") && scope.targets?.frontend?.enabled && plan.mode === "passive") {
@@ -116,6 +118,19 @@ async function runBuiltInChecks(cwd, scope, plan, scanDir, options) {
     } catch (error) {
       observations.push({
         check: "frontend_passive_headers",
+        status: "not_completed",
+        detail: error.message
+      });
+    }
+
+    try {
+      const siteMap = await discoverFrontendSite(cwd, scope, scanDir, options);
+      discovery = siteMap.discovery;
+      observations.push(siteMap.observation);
+      findings.push(...siteMap.findings);
+    } catch (error) {
+      observations.push({
+        check: "frontend_site_discovery",
         status: "not_completed",
         detail: error.message
       });
@@ -142,7 +157,7 @@ async function runBuiltInChecks(cwd, scope, plan, scanDir, options) {
     });
   }
 
-  return { findings, observations };
+  return { findings, observations, discovery };
 }
 
 export async function recordFrontendAnomaly(cwd, scanDir, type, details) {
@@ -208,7 +223,7 @@ export async function runPlan(cwd, options = {}) {
   const scanDir = path.resolve(cwd, ".aegis/scans", scanId);
   await ensureDir(scanDir);
 
-  const { findings, observations } = await runBuiltInChecks(cwd, scope, plan, scanDir, options);
+  const { findings, observations, discovery } = await runBuiltInChecks(cwd, scope, plan, scanDir, options);
   const normalizedFindings = await appendFindings(cwd, scanId, scope, findings);
   const result = {
     scan_id: scanId,
@@ -221,6 +236,7 @@ export async function runPlan(cwd, options = {}) {
     selected_check_count: plan.selected_checks.length,
     executed_check_count: observations.length,
     observations,
+    discovery,
     findings: normalizedFindings
   };
   await writeJson(path.join(scanDir, "results.json"), result);

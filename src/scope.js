@@ -105,6 +105,25 @@ function pathAllowed(pathname, allowedPaths = ["/*"], deniedPaths = []) {
   return allowedPaths.some((pattern) => globToRegExp(pattern).test(pathname));
 }
 
+function assertDiscoveryConfig(target, targetConfig) {
+  const discovery = targetConfig.discovery;
+  if (!discovery || discovery.enabled === false) {
+    return;
+  }
+
+  const maxDepth = Number(discovery.max_depth ?? 2);
+  const maxPages = Number(discovery.max_pages ?? 30);
+  if (!Number.isFinite(maxDepth) || maxDepth < 0 || maxDepth > 5) {
+    throw new Error(`Target ${target} discovery.max_depth must be between 0 and 5`);
+  }
+  if (!Number.isFinite(maxPages) || maxPages < 1 || maxPages > 200) {
+    throw new Error(`Target ${target} discovery.max_pages must be between 1 and 200`);
+  }
+  if (discovery.submit_forms) {
+    throw new Error(`Target ${target} discovery.submit_forms is not allowed by the default safety policy`);
+  }
+}
+
 export function assertUrlInScope(scope, target, urlValue) {
   const targetConfig = getTargetConfig(scope, target);
   const parsed = new URL(urlValue);
@@ -142,6 +161,7 @@ export async function verifyScope(cwd, options = {}) {
       continue;
     }
     assertUrlInScope(scope, target, targetConfig.base_url);
+    assertDiscoveryConfig(target, targetConfig);
     checks.push({ target, base_url: targetConfig.base_url, status: "in_scope" });
   }
 
@@ -160,4 +180,3 @@ export async function verifyScope(cwd, options = {}) {
     checks
   };
 }
-

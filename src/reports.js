@@ -15,6 +15,7 @@ function mdEscape(value) {
 
 function renderMarkdown(scope, scan, findings) {
   const grouped = groupBySeverity(findings);
+  const discovery = discoverySummary(scan);
   const findingRows = findings.length
     ? findings
         .map((finding) => `| ${finding.id} | ${finding.severity} | ${mdEscape(finding.target_type)} | ${mdEscape(finding.title)} | ${finding.status} |`)
@@ -47,6 +48,15 @@ function renderMarkdown(scope, scan, findings) {
 - Target: ${scan?.target || "not run"}
 - Selected checks: ${scan?.selected_check_count ?? 0}
 - Executed built-in checks: ${scan?.executed_check_count ?? 0}
+
+## Site Discovery
+
+- Routes discovered: ${discovery.routes}
+- Links discovered: ${discovery.links}
+- Forms discovered: ${discovery.forms}
+- Auth surfaces: ${discovery.authSurfaces}
+- Blocked out-of-scope URLs: ${discovery.blockedUrls}
+- Artifact: ${discovery.artifactPath || "not generated"}
 
 ## Findings by Severity
 
@@ -122,9 +132,40 @@ function renderRecommendations(findings) {
     .join("\n");
 }
 
+function discoverySummary(scan) {
+  const discovery = scan?.discovery || {};
+  return {
+    routes: discovery.routes?.length || 0,
+    links: discovery.links?.length || 0,
+    forms: discovery.forms?.length || 0,
+    authSurfaces: discovery.auth_surfaces?.length || 0,
+    blockedUrls: discovery.blocked_urls?.length || 0,
+    artifactPath: scan?.observations?.find((observation) => observation.check === "frontend_site_discovery")?.artifact_path || ""
+  };
+}
+
+function renderDiscoveryRows(discovery) {
+  const routes = discovery?.routes || [];
+  if (routes.length === 0) {
+    return '<tr><td colspan="4" class="empty">No site discovery routes recorded.</td></tr>';
+  }
+  return routes
+    .slice(0, 20)
+    .map(
+      (route) => `<tr>
+        <td>${htmlEscape(route.status)}</td>
+        <td>${htmlEscape(route.path || route.url)}</td>
+        <td>${htmlEscape(route.depth ?? 0)}</td>
+        <td>${htmlEscape(route.source || "discovery")}</td>
+      </tr>`
+    )
+    .join("\n");
+}
+
 function renderHtmlReport(scope, scan, findings) {
   const counts = severityCounts(findings);
   const status = statusText(findings);
+  const discovery = discoverySummary(scan);
   const generatedAt = new Date().toISOString();
 
   return `<!doctype html>
@@ -268,6 +309,22 @@ function renderHtmlReport(scope, scan, findings) {
         </dl>
       </section>
     </div>
+
+    <section>
+      <h2>Site Discovery Map</h2>
+      <dl>
+        <dt>Routes</dt><dd>${htmlEscape(discovery.routes)}</dd>
+        <dt>Links</dt><dd>${htmlEscape(discovery.links)}</dd>
+        <dt>Forms</dt><dd>${htmlEscape(discovery.forms)}</dd>
+        <dt>Auth surfaces</dt><dd>${htmlEscape(discovery.authSurfaces)}</dd>
+        <dt>Blocked URLs</dt><dd>${htmlEscape(discovery.blockedUrls)}</dd>
+        <dt>Artifact</dt><dd>${htmlEscape(discovery.artifactPath || "not generated")}</dd>
+      </dl>
+      <table>
+        <thead><tr><th>Status</th><th>Path</th><th>Depth</th><th>Source</th></tr></thead>
+        <tbody>${renderDiscoveryRows(scan?.discovery)}</tbody>
+      </table>
+    </section>
 
     <section>
       <h2>Findings</h2>

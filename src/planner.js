@@ -30,6 +30,13 @@ export async function createPlan(cwd, options = {}) {
       max_concurrency: scope.safety?.max_concurrency ?? 3,
       destructive_tests: false
     },
+    discovery: {
+      enabled: scope.targets?.frontend?.discovery?.enabled !== false,
+      max_depth: scope.targets?.frontend?.discovery?.max_depth ?? 2,
+      max_pages: scope.targets?.frontend?.discovery?.max_pages ?? 30,
+      same_scope_only: true,
+      submits_forms: false
+    },
     selected_checks: checks.map((check) => ({
       id: check.id,
       title: check.title,
@@ -51,4 +58,3 @@ export async function createPlan(cwd, options = {}) {
 export async function loadPlan(cwd, planFile = "aegis.plan.json") {
   return readJson(path.resolve(cwd, planFile));
 }
-

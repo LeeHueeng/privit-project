@@ -283,7 +283,16 @@ export function createDefaultScope(projectName = "aegis-project", environment = 
         base_url: "http://localhost:3000",
         allowed_hosts: ["localhost", "127.0.0.1"],
         allowed_paths: ["/*"],
-        denied_paths: ["/payments/live/*", "/admin/delete/*"]
+        denied_paths: ["/payments/live/*", "/admin/delete/*"],
+        discovery: {
+          enabled: true,
+          max_depth: 2,
+          max_pages: 30,
+          include_forms: true,
+          follow_redirects: true,
+          sitemap_paths: ["/robots.txt", "/sitemap.xml"],
+          login_indicators: ["login", "signin", "sign-in", "auth", "session", "admin", "account"]
+        }
       },
       backend_api: {
         enabled: false,
@@ -332,6 +341,13 @@ export function createDefaultPolicy() {
     tool_allowlist_required: true,
     secret_redaction_before_llm: true,
     human_approval_for_high_risk_actions: true,
+    passive_site_discovery: {
+      same_scope_only: true,
+      no_form_submission: true,
+      no_brute_force: true,
+      max_depth_default: 2,
+      max_pages_default: 30
+    },
     localization: SUPPORTED_LANGUAGE_CONFIG,
     disallowed_capabilities: [
       "unauthorized_target_testing",

@@ -1,7 +1,8 @@
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { createServer } from "node:http";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
@@ -21,6 +22,46 @@ function runCli(cwd, args) {
     cwd,
     encoding: "utf8"
   });
+}
+
+function runCliAsync(cwd, args) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [binPath, ...args], {
+      cwd,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    let stdout = "";
+    let stderr = "";
+    const timeout = setTimeout(() => {
+      child.kill("SIGTERM");
+      stderr += "\nTimed out waiting for CLI process.";
+    }, 10000);
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("close", (status) => {
+      clearTimeout(timeout);
+      resolve({ status, stdout, stderr });
+    });
+  });
+}
+
+async function withLocalSite(handler, callback) {
+  const server = createServer(handler);
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+  try {
+    return await callback(baseUrl);
+  } finally {
+    server.closeAllConnections?.();
+    server.closeIdleConnections?.();
+    await new Promise((resolve) => server.close(resolve));
+  }
 }
 
 test("run fails when scope file is missing", async () => {
@@ -142,4 +183,54 @@ test("html report renders dashboard sections", async () => {
   assert.match(html, /Finding severity summary/);
   assert.match(html, /Scope and Authorization/);
   assert.match(html, /Recommended Fixes/);
+});
+
+test("passive frontend discovery maps login routes and forms in scope", async () => {
+  await withLocalSite((req, res) => {
+    const url = new URL(req.url, "http://127.0.0.1");
+    res.setHeader("connection", "close");
+    res.setHeader("content-type", url.pathname.endsWith(".xml") ? "application/xml" : "text/html; charset=utf-8");
+    if (url.pathname === "/robots.txt") {
+      res.end(`User-agent: *\nSitemap: http://${req.headers.host}/sitemap.xml\n`);
+      return;
+    }
+    if (url.pathname === "/sitemap.xml") {
+      res.end(`<?xml version="1.0"?><urlset><url><loc>http://${req.headers.host}/login</loc></url></urlset>`);
+      return;
+    }
+    if (url.pathname === "/login") {
+      res.end('<form method="get" action="/sessions"><input name="email"><input type="password" name="password"></form>');
+      return;
+    }
+    if (url.pathname === "/dashboard") {
+      res.end('<a href="/admin">Admin</a>');
+      return;
+    }
+    if (url.pathname === "/admin") {
+      res.end("<h1>Admin</h1>");
+      return;
+    }
+    res.end('<a href="/login">Login</a><a href="/dashboard">Dashboard</a><a href="https://outside.example/">Outside</a>');
+  }, async (baseUrl) => {
+    const cwd = await tempWorkspace();
+    const scope = createDefaultScope("mapped-project", "local");
+    scope.targets.frontend.base_url = baseUrl;
+    scope.targets.frontend.allowed_hosts = ["127.0.0.1"];
+    scope.targets.frontend.discovery.max_depth = 2;
+    scope.targets.frontend.discovery.max_pages = 10;
+    await writeFile(path.join(cwd, "aegis.scope.json"), `${JSON.stringify(scope, null, 2)}\n`, "utf8");
+
+    const result = await runCliAsync(cwd, ["run", "--target", "frontend", "--mode", "passive", "--max-depth", "2", "--max-pages", "10"]);
+    assert.equal(result.status, 0, result.stderr);
+    const output = JSON.parse(result.stdout);
+    assert.ok(output.discovery.routes.some((route) => route.path === "/login"));
+    assert.ok(output.discovery.routes.some((route) => route.path === "/admin"));
+    assert.ok(output.discovery.auth_surfaces.some((surface) => surface.type === "form" && surface.password_field));
+    assert.ok(output.discovery.blocked_urls.some((entry) => /outside\.example/.test(entry.to)));
+    assert.ok(output.findings.some((finding) => finding.title === "Login-like form uses GET"));
+
+    const artifactPath = output.observations.find((observation) => observation.check === "frontend_site_discovery").artifact_path;
+    const artifact = JSON.parse(await readFile(path.join(cwd, artifactPath), "utf8"));
+    assert.equal(artifact.auth_surfaces.length >= 1, true);
+  });
 });
