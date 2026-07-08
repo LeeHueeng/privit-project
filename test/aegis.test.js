@@ -126,3 +126,20 @@ test("simulated frontend console error stores log and screenshot artifacts", asy
   assert.match(await readFile(logPath, "utf8"), /Simulated console error/);
   assert.ok((await readFile(pngPath)).length > 0);
 });
+
+test("html report renders dashboard sections", async () => {
+  const cwd = await tempWorkspace();
+  const init = runCli(cwd, ["init"]);
+  assert.equal(init.status, 0, init.stderr);
+
+  const run = runCli(cwd, ["run", "--target", "frontend", "--mode", "passive", "--dry-run", "--simulate-console-error"]);
+  assert.equal(run.status, 0, run.stderr);
+
+  const report = runCli(cwd, ["report", "--format", "html"]);
+  assert.equal(report.status, 0, report.stderr);
+  const output = JSON.parse(report.stdout);
+  const html = await readFile(output.file, "utf8");
+  assert.match(html, /Finding severity summary/);
+  assert.match(html, /Scope and Authorization/);
+  assert.match(html, /Recommended Fixes/);
+});
