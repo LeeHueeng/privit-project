@@ -232,5 +232,10 @@ test("passive frontend discovery maps login routes and forms in scope", async ()
     const artifactPath = output.observations.find((observation) => observation.check === "frontend_site_discovery").artifact_path;
     const artifact = JSON.parse(await readFile(path.join(cwd, artifactPath), "utf8"));
     assert.equal(artifact.auth_surfaces.length >= 1, true);
+
+    const second = await runCliAsync(cwd, ["run", "--target", "frontend", "--mode", "passive", "--max-depth", "2", "--max-pages", "10"]);
+    assert.equal(second.status, 0, second.stderr);
+    const storedFindings = JSON.parse(await readFile(path.join(cwd, ".aegis/findings.json"), "utf8"));
+    assert.equal(storedFindings.filter((finding) => finding.title === "Login-like form uses GET").length, 1);
   });
 });

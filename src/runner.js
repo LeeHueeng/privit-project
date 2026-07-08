@@ -184,17 +184,49 @@ async function appendFindings(cwd, scanId, scope, findings) {
     existing = await readJson(findingsPath);
   }
   const now = new Date().toISOString();
-  const normalized = findings.map((finding, index) => ({
-    id: `FIND-${now.slice(0, 4)}-${String(existing.length + index + 1).padStart(6, "0")}`,
-    project: scope.project,
-    environment: scope.environment,
-    scan_id: scanId,
-    status: "new",
-    created_at: now,
-    updated_at: now,
-    ...finding
-  }));
-  await writeJson(findingsPath, [...existing, ...normalized]);
+  const next = [...existing];
+  const normalized = [];
+
+  function keyFor(finding) {
+    return [scope.project, scope.environment, finding.target_type, finding.category, finding.asset, finding.title].join("|");
+  }
+
+  for (const finding of findings) {
+    const key = keyFor(finding);
+    const existingIndex = next.findIndex((candidate) => keyFor(candidate) === key);
+    if (existingIndex >= 0) {
+      const previous = next[existingIndex];
+      const updated = {
+        ...previous,
+        ...finding,
+        id: previous.id,
+        project: scope.project,
+        environment: scope.environment,
+        scan_id: scanId,
+        status: previous.status || "new",
+        created_at: previous.created_at || now,
+        updated_at: now
+      };
+      next[existingIndex] = updated;
+      normalized.push(updated);
+      continue;
+    }
+
+    const created = {
+      id: `FIND-${now.slice(0, 4)}-${String(next.length + 1).padStart(6, "0")}`,
+      project: scope.project,
+      environment: scope.environment,
+      scan_id: scanId,
+      status: "new",
+      created_at: now,
+      updated_at: now,
+      ...finding
+    };
+    next.push(created);
+    normalized.push(created);
+  }
+
+  await writeJson(findingsPath, next);
   return normalized;
 }
 
