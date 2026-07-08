@@ -1,0 +1,21 @@
+services:
+  aegis-cli:
+    build: .
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: ["run", "--scope", "aegis.scope.json", "--mode", "passive", "--dry-run"]
+
+  playwright-worker:
+    build: .
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: ["run", "--target", "frontend", "--mode", "passive", "--dry-run"]
+
+  sast-worker:
+    build: .
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: ["run", "--mode", "ci", "--dry-run"]

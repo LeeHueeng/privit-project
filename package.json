@@ -1,0 +1,25 @@
+{
+  "name": "@aegis/security-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Authorized security testing CLI MVP with scope guard, safe check catalog, planning, dry-run execution, and reports.",
+  "bin": {
+    "aegis": "./bin/aegis.js"
+  },
+  "scripts": {
+    "aegis": "node ./bin/aegis.js",
+    "catalog:generate": "node ./scripts/generate-catalog.js",
+    "docs:generate": "node ./bin/aegis.js docs generate",
+    "security:init": "node ./bin/aegis.js init",
+    "security:plan": "node ./bin/aegis.js plan --mode safe_active",
+    "security:frontend": "node ./bin/aegis.js run --target frontend",
+    "security:api": "node ./bin/aegis.js run --target backend_api",
+    "security:ci": "node ./bin/aegis.js run --mode ci",
+    "security:report": "node ./bin/aegis.js report --format html",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

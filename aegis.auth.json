@@ -1,0 +1,5 @@
+{
+  "version": "0.1.0",
+  "auth_profiles": [],
+  "note": "Store test-account metadata only. Do not store production credentials."
+}
