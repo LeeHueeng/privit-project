@@ -1,0 +1,38 @@
+# Aegis Security CLI
+
+[English](./README.md) · [한국어](./README.ko.md) · [日本語](./README.ja.md) · [中文](./README.zh-CN.md)
+
+Aegis Security CLI는 승인된 범위 안에서만 동작하는 비파괴 보안 검증
+CLI입니다. 실행 전에 scope를 확인하고, 안전한 catalog에서 검사를 고르며,
+민감 정보를 마스킹한 뒤 JSON, Markdown, HTML, SARIF 보고서를 생성합니다.
+
+## 빠른 시작
+
+```bash
+npm install
+npm run catalog:generate
+npm run aegis -- init
+npm run aegis -- scope verify
+npm run aegis -- plan --mode passive --target frontend
+npm run aegis -- run --target frontend --mode passive --dry-run
+npm run aegis -- report --format html
+```
+
+공개 후 GitHub에서 바로 설치:
+
+```bash
+npm install -g github:LeeHueeng/privit-project
+aegis help --lang ko-KR
+```
+
+npm 패키지명은 `aegis-security-cli`로 준비되어 있지만 아직 npm registry에는
+등록하지 않았습니다.
+
+## 특징
+
+- 기본값은 passive와 scope guard
+- 2,430개 안전 검증 catalog
+- 한국어, 영어, 일본어, 중국어 문서와 도움말
+- 마스킹된 evidence와 보고서 생성
+- SARIF 출력 지원
+- Privit Aegis Workspace의 CLI 엔진

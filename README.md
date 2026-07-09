@@ -1,6 +1,34 @@
-# Aegis CLI
+# Aegis Security CLI
 
-Aegis CLI is an MVP scaffold for authorized, non-destructive security verification. It follows the attached planning document by enforcing scope first, selecting checks from a safe catalog, redacting sensitive data, and producing reports.
+<p align="center">
+  <a href="https://github.com/LeeHueeng/privit-project/actions/workflows/aegis-security.yml"><img alt="Aegis Security" src="https://github.com/LeeHueeng/privit-project/actions/workflows/aegis-security.yml/badge.svg"></a>
+  <img alt="Passive by default" src="https://img.shields.io/badge/security-passive%20by%20default-0f766e">
+  <img alt="Multilingual" src="https://img.shields.io/badge/i18n-ko%20%7C%20en%20%7C%20ja%20%7C%20zh-2563eb">
+  <img alt="npm ready" src="https://img.shields.io/badge/npm-ready-cb3837">
+</p>
+
+<p align="center">
+  <a href="./README.ko.md">한국어</a> ·
+  <a href="./README.md">English</a> ·
+  <a href="./README.ja.md">日本語</a> ·
+  <a href="./README.zh-CN.md">中文</a>
+</p>
+
+Aegis Security CLI is an authorized, non-destructive security verification CLI.
+It enforces scope before execution, selects checks from a safe catalog, redacts
+sensitive data, and produces JSON, Markdown, HTML, and SARIF reports.
+
+It is the reusable CLI engine used by the Privit Aegis Workspace:
+<https://github.com/LeeHueeng/privit-aegis-workspace>.
+
+## Why Star It
+
+- Passive and scope-guarded by default
+- 2,430 generated safe verification checks
+- Korean, English, Japanese, and Chinese CLI/docs support
+- Redacted evidence and report generation built in
+- SARIF output for security review systems
+- Small Node.js CLI with no runtime dependencies
 
 ## Languages
 
@@ -24,6 +52,7 @@ Localized docs are generated under:
 ## Quick Start
 
 ```bash
+npm install
 npm run catalog:generate
 npm run aegis -- init
 npm run aegis -- scope verify
@@ -31,6 +60,16 @@ npm run aegis -- plan --mode passive --target frontend
 npm run aegis -- run --target frontend --mode passive --dry-run
 npm run aegis -- report --format html
 ```
+
+Install directly from GitHub after this repository is public:
+
+```bash
+npm install -g github:LeeHueeng/privit-project
+aegis help --lang ko-KR
+```
+
+The package is prepared for npm as `aegis-security-cli`, but it has not been
+published to npm yet.
 
 ## Safety Defaults
 
@@ -71,3 +110,23 @@ aegis report --format sarif
 - `docs/HUMAN_SECURITY_GUIDE.md`: human usage guide.
 - `docs/{ko-KR,ja-JP,zh-CN,en-US}/`: localized agent and human guides.
 - `.aegis/`: local scan results, artifacts, findings, and reports.
+
+## Documentation
+
+- Examples: [`docs/EXAMPLES.md`](./docs/EXAMPLES.md)
+- Architecture: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
+- Detection catalog: [`docs/DETECTION_CATALOG.md`](./docs/DETECTION_CATALOG.md)
+- Release process: [`docs/RELEASE_PROCESS.md`](./docs/RELEASE_PROCESS.md)
+- Roadmap: [`docs/ROADMAP.md`](./docs/ROADMAP.md)
+
+## Safety Model
+
+This project is for authorized testing only. Do not use it against systems you
+do not own or do not have written permission to test. Destructive, brute-force,
+exfiltration, persistence, and evasion behavior is blocked by default.
+
+## Contributing
+
+Issues and pull requests are welcome when they keep the default behavior safe
+and passive. Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md) and run
+`npm test` before opening a pull request.

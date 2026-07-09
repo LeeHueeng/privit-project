@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest a safe CLI, report, or documentation improvement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the smallest useful safe version.
+    validations:
+      required: true
+  - type: dropdown
+    id: safety
+    attributes:
+      label: Safety profile
+      options:
+        - Passive only
+        - Documentation only
+        - Requires explicit scope approval
+        - Unsure
+    validations:
+      required: true

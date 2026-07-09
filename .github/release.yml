@@ -1,0 +1,21 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+  categories:
+    - title: CLI
+      labels:
+        - cli
+    - title: Security
+      labels:
+        - security
+        - detection
+    - title: Documentation
+      labels:
+        - documentation
+        - i18n
+    - title: Other
+      labels:
+        - "*"

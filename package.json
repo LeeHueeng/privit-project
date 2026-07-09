@@ -1,9 +1,48 @@
 {
-  "name": "@aegis/security-cli",
+  "name": "aegis-security-cli",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
-  "description": "Authorized security testing CLI MVP with scope guard, safe check catalog, planning, dry-run execution, and reports.",
+  "description": "Authorized passive security testing CLI with scope guard, multilingual docs, redacted reports, and safe-by-default checks.",
+  "license": "MIT",
+  "keywords": [
+    "security-tools",
+    "web-security",
+    "owasp",
+    "passive-scanner",
+    "security-automation",
+    "cli",
+    "i18n",
+    "sarif",
+    "redaction",
+    "authorized-testing"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeeHueeng/privit-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LeeHueeng/privit-project/issues"
+  },
+  "homepage": "https://github.com/LeeHueeng/privit-project#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "scripts/generate-catalog.js",
+    "catalog/security-checks.jsonl",
+    "docs/",
+    "aegis.policy.json",
+    "aegis.scope.json",
+    "aegis.auth.json",
+    "README.md",
+    "README.ko.md",
+    "README.ja.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
   "bin": {
     "aegis": "./bin/aegis.js"
   },
