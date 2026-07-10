@@ -36,3 +36,27 @@ npm run docs:generate:ja
 npm run docs:generate:zh
 npm run docs:generate:en
 ```
+
+## Install as a Workspace Engine
+
+Use the public GitHub source directly:
+
+```bash
+npm install -g github:LeeHueeng/privit-project
+aegis help --lang ko-KR
+```
+
+Pin a specific engine revision in CI:
+
+```bash
+npm install -g "git+https://github.com/LeeHueeng/privit-project.git#<commit-sha>"
+```
+
+For local development, link the package into a workspace:
+
+```bash
+npm link
+cd ../privit-aegis-workspace
+npm link aegis-security-cli
+aegis scope verify
+```

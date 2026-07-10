@@ -1,5 +1,10 @@
 # Architecture
 
+Aegis Security CLI is intentionally a small engine repository. It owns command
+dispatch, scope verification, catalog generation, passive execution, redaction,
+and report writers. Product-specific web UI, hosted docs, and local report state
+belong in a workspace such as `privit-aegis-workspace`.
+
 ```mermaid
 flowchart LR
   CLI["bin/aegis.js"] --> Args["src/args.js"]
@@ -11,6 +16,18 @@ flowchart LR
   Reports --> Redaction["src/redaction.js"]
   Docs["src/docs.js"] --> I18n["src/i18n.js"]
 ```
+
+## Repository Boundary
+
+| Layer | Owned here | Owned by workspace |
+| --- | --- | --- |
+| CLI command parsing | yes | no |
+| Scope and policy enforcement | yes | config only |
+| Safe check catalog generation | yes | generated catalog copy |
+| Passive runner and report writers | yes | orchestration and localization |
+| Web console | no | yes |
+| GitHub Pages showcase | no | yes |
+| AIGate project gate | no | yes |
 
 ## Modules
 
@@ -32,3 +49,4 @@ flowchart LR
 - Redact before reporting
 - Keep AI-facing data sanitized
 - Make localized docs deterministic
+- Keep reusable engine code separate from project-specific workspace assets

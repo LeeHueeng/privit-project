@@ -15,7 +15,9 @@
 - More report examples
 - Public fixtures
 - Stronger GitHub Actions hardening
-- Workspace integration examples
+- Workspace integration examples and compatibility notes
+- Versioned CLI contract for workspace consumers
+- Report fixture gallery for JSON, HTML, Markdown, and SARIF
 
 ## Non-Goals
 
