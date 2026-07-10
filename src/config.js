@@ -1,3 +1,5 @@
+import { applyTrainingProfile } from "./profiles.js";
+
 export const VERSION = "0.1.0";
 
 export const SUPPORTED_LANGUAGE_CONFIG = {
@@ -271,10 +273,10 @@ export const SENSITIVE_FIELDS = [
   "payment_card"
 ];
 
-export function createDefaultScope(projectName = "aegis-project", environment = "local") {
+export function createDefaultScope(projectName = "aegis-project", environment = "local", profileId) {
   const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  return {
+  const scope = {
     project: projectName,
     environment,
     targets: {
@@ -328,6 +330,8 @@ export function createDefaultScope(projectName = "aegis-project", environment = 
       production_active_scan: false
     }
   };
+
+  return profileId ? applyTrainingProfile(scope, profileId) : scope;
 }
 
 export function createDefaultPolicy() {

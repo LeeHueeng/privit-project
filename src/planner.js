@@ -1,6 +1,7 @@
 import path from "node:path";
 import { loadCatalog, selectChecks } from "./catalog.js";
 import { readJson, writeJson } from "./io.js";
+import { getProfile } from "./profiles.js";
 import { loadScope, verifyScope } from "./scope.js";
 
 export async function createPlan(cwd, options = {}) {
@@ -10,12 +11,18 @@ export async function createPlan(cwd, options = {}) {
   const manualApproval = Boolean(options.manualApproval);
   await verifyScope(cwd, { scopeFile: options.scopeFile, mode, manualApproval, target });
   const { scope } = await loadScope(cwd, options.scopeFile);
+  const profileId = options.profile || scope.training_profile?.id;
+  const profile = getProfile(profileId);
+  if (profileId && !profile) {
+    throw new Error(`Unknown training profile: ${profileId}`);
+  }
   const catalog = await loadCatalog(cwd, options.catalogFile);
   const checks = selectChecks(catalog, {
     mode,
     target,
     includeManualApproval: manualApproval,
-    limit
+    limit,
+    priorityCategories: profile?.priority_categories || []
   });
 
   const plan = {
@@ -24,6 +31,16 @@ export async function createPlan(cwd, options = {}) {
     environment: scope.environment,
     mode,
     target: target || "all",
+    training_profile: profile
+      ? {
+          id: profile.id,
+          label: profile.label,
+          description: profile.description,
+          priority_categories: profile.priority_categories,
+          evidence_focus: profile.evidence_focus,
+          risk_questions: profile.risk_questions
+        }
+      : scope.training_profile,
     generated_at: new Date().toISOString(),
     safety: {
       max_rps: scope.safety?.max_rps ?? 2,

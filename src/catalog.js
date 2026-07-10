@@ -106,9 +106,14 @@ export async function loadCatalog(cwd, file = DEFAULT_CATALOG_FILE) {
     });
 }
 
-export function selectChecks(entries, { mode = "passive", target, includeManualApproval = false, limit = 100 } = {}) {
+function profilePriority(entry, priorityCategories = []) {
+  const index = priorityCategories.indexOf(entry.category);
+  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+}
+
+export function selectChecks(entries, { mode = "passive", target, includeManualApproval = false, limit = 100, priorityCategories = [] } = {}) {
   const allowedAdapters = new Set(Object.keys(TOOL_ADAPTERS));
-  const selected = [];
+  const candidates = [];
   for (const entry of entries) {
     if (target && entry.target_type !== target) {
       continue;
@@ -125,11 +130,9 @@ export function selectChecks(entries, { mode = "passive", target, includeManualA
     if (!allowedAdapters.has(entry.tool_adapter)) {
       continue;
     }
-    selected.push(entry);
-    if (selected.length >= limit) {
-      break;
-    }
+    candidates.push(entry);
   }
-  return selected;
+  return candidates
+    .sort((left, right) => profilePriority(left, priorityCategories) - profilePriority(right, priorityCategories))
+    .slice(0, limit);
 }
-
