@@ -67,6 +67,22 @@
 5. 알 수 없는 도구 어댑터를 거부합니다.
 6. scope safety 설정의 rate limit과 concurrency를 적용합니다.
 
+## 다양한 훈련 프로파일
+
+Aegis는 하나의 회사나 한 업종에 고정되지 않습니다. 승인된 범위는 그대로 유지하면서 업종별 위험 질문, 우선 검사군, 증거 수집 관점을 바꿔서 사용할 수 있습니다.
+
+| 프로파일 | 설명 | 안전 모드 | 주요 대상 |
+| --- | --- | --- | --- |
+| baseline_web | General web application coverage for teams starting from a neutral baseline. | passive, ci, safe_active | frontend, backend_api, ci_cd |
+| saas_b2b | Tenant isolation, role boundaries, admin surfaces, billing metadata, and integration settings. | passive, authenticated, ci | frontend, backend_api, ci_cd |
+| ecommerce_marketplace | Checkout, seller workflows, price integrity, inventory transitions, coupons, and order privacy. | passive, safe_active, ci | frontend, backend_api, ci_cd |
+| fintech_payments | High-sensitivity passive-first coverage for payments, wallet, ledger, KYC, and audit evidence. | passive, ci, db_audit | frontend, backend_api, database, ci_cd |
+| healthcare_privacy | Patient privacy, appointment workflows, consent boundaries, portal access, and auditability. | passive, authenticated, ci, db_audit | frontend, backend_api, database, ci_cd |
+| public_education | Citizen or student portals, document workflows, accessibility-adjacent evidence, and procurement-safe CI. | passive, ci, authenticated | frontend, backend_api, ci_cd |
+| internal_admin | Backoffice role separation, support tooling, audit trails, admin routes, and safe operational checks. | passive, authenticated, ci, db_audit | frontend, backend_api, database, ci_cd |
+| api_platform | OpenAPI hygiene, API keys, rate-limit metadata, developer docs, webhooks, and integration boundaries. | passive, safe_active, authenticated, ci | backend_api, frontend, ci_cd |
+| media_community | User-generated content, moderation queues, profile privacy, notification flows, and media metadata. | passive, safe_active, authenticated, ci | frontend, backend_api, ci_cd |
+
 ## 증거 수집
 
 artifact는 `.aegis/artifacts/<target>/<scan-id>/`에 저장하고 정규화된 결과는 `.aegis/scans/<scan-id>/results.json`에 저장합니다. 요청/응답 메타데이터는 저장하되 민감한 값은 저장하지 않습니다.

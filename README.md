@@ -73,12 +73,38 @@ Localized docs are generated under:
 ```bash
 npm install
 npm run catalog:generate
-npm run aegis -- init
+npm run aegis -- profiles list
+npm run aegis -- init --profile baseline_web
 npm run aegis -- scope verify
-npm run aegis -- plan --mode passive --target frontend
+npm run aegis -- plan --mode passive --target frontend --profile baseline_web
 npm run aegis -- run --target frontend --mode passive --dry-run
 npm run aegis -- report --format html
 ```
+
+## Diverse Training Profiles
+
+Aegis is not limited to one company or one service shape. Use profiles to adjust
+safe priorities, evidence focus, role assumptions, and denied path hints for
+different authorized training contexts.
+
+```bash
+npm run aegis -- profiles list
+npm run aegis -- profiles show fintech_payments
+npm run aegis -- init --profile healthcare_privacy
+npm run aegis -- plan --mode passive --target frontend --profile ecommerce_marketplace
+```
+
+Current profiles include:
+
+- `baseline_web`: neutral web application baseline
+- `saas_b2b`: multi-tenant B2B SaaS and support workflows
+- `ecommerce_marketplace`: checkout, seller, order, coupon, and inventory flows
+- `fintech_payments`: passive-first payments, wallet, ledger, KYC, and audit coverage
+- `healthcare_privacy`: patient privacy, consent, portal, and clinical workflow coverage
+- `public_education`: citizen, student, staff, and document workflow coverage
+- `internal_admin`: backoffice, support, admin, and operational workflow coverage
+- `api_platform`: OpenAPI, API key, webhook, integration, and developer portal coverage
+- `media_community`: user-generated content, moderation, profile, and media metadata coverage
 
 Install directly from GitHub after this repository is public:
 
@@ -94,11 +120,13 @@ published to npm yet.
 
 | Task | Command |
 | --- | --- |
-| Create starter files | `aegis init` |
+| Create starter files | `aegis init --profile baseline_web` |
+| List training profiles | `aegis profiles list` |
+| Inspect a profile | `aegis profiles show saas_b2b` |
 | Verify authorization and allowlists | `aegis scope verify` |
 | Rebuild the safe check catalog | `aegis catalog generate` |
 | Generate multilingual guides | `aegis docs generate --lang all` |
-| Plan passive frontend checks | `aegis plan --mode passive --target frontend` |
+| Plan passive frontend checks | `aegis plan --mode passive --target frontend --profile saas_b2b` |
 | Execute a dry run | `aegis run --mode passive --target frontend --dry-run` |
 | List findings | `aegis findings list` |
 | Build a human report | `aegis report --format html` |
@@ -141,6 +169,8 @@ two-repository workflow.
 
 ```bash
 aegis init
+aegis profiles list
+aegis profiles show saas_b2b
 aegis scope verify
 aegis catalog generate
 aegis docs generate --lang all
@@ -148,7 +178,7 @@ aegis docs generate --lang ko-KR
 aegis docs generate --lang ja-JP
 aegis docs generate --lang zh-CN
 aegis docs generate --lang en-US
-aegis plan --mode passive --target frontend
+aegis plan --mode passive --target frontend --profile saas_b2b
 aegis run --mode passive --target frontend --dry-run
 aegis findings list
 aegis report --format markdown

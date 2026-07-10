@@ -1,6 +1,7 @@
 import { CATEGORY_DISTRIBUTION, EXECUTION_MODES, TOOL_ADAPTERS } from "./config.js";
 import { DEFAULT_LOCALE, localesFor, normalizeLocale, SUPPORTED_LOCALES } from "./i18n.js";
 import { writeText } from "./io.js";
+import { listProfiles } from "./profiles.js";
 
 const STRINGS = {
   "ko-KR": {
@@ -13,6 +14,9 @@ const STRINGS = {
     tools: "허용 도구",
     modes: "실행 모드 매트릭스",
     catalog: "체크 카탈로그 선택",
+    trainingProfiles: "다양한 훈련 프로파일",
+    trainingProfilesIntro: "Aegis는 하나의 회사나 한 업종에 고정되지 않습니다. 승인된 범위는 그대로 유지하면서 업종별 위험 질문, 우선 검사군, 증거 수집 관점을 바꿔서 사용할 수 있습니다.",
+    profileHeader: "| 프로파일 | 설명 | 안전 모드 | 주요 대상 |",
     evidence: "증거 수집",
     frontend: "프론트엔드 이상 캡처",
     auth: "인증 테스트 규칙",
@@ -77,6 +81,9 @@ const STRINGS = {
     tools: "許可ツール",
     modes: "実行モードマトリクス",
     catalog: "チェックカタログ選択",
+    trainingProfiles: "多様なトレーニングプロファイル",
+    trainingProfilesIntro: "Aegis は 1 社または 1 業種に固定されません。承認済みスコープを維持しながら、業種別のリスク質問、優先チェック、証拠収集の観点を切り替えられます。",
+    profileHeader: "| プロファイル | 説明 | 安全モード | 主な対象 |",
     evidence: "証拠収集",
     frontend: "フロントエンド異常キャプチャ",
     auth: "認証テストルール",
@@ -141,6 +148,9 @@ const STRINGS = {
     tools: "允许的工具",
     modes: "执行模式矩阵",
     catalog: "检查目录选择",
+    trainingProfiles: "多样化训练配置",
+    trainingProfilesIntro: "Aegis 不绑定到单一公司或行业。在保持授权范围不变的前提下，可以切换行业风险问题、优先检查类别和证据收集视角。",
+    profileHeader: "| 配置 | 说明 | 安全模式 | 主要目标 |",
     evidence: "证据收集",
     frontend: "前端异常捕获",
     auth: "认证测试规则",
@@ -205,6 +215,9 @@ const STRINGS = {
     tools: "Allowed Tools",
     modes: "Execution Mode Matrix",
     catalog: "Check Catalog Selection",
+    trainingProfiles: "Diverse Training Profiles",
+    trainingProfilesIntro: "Aegis is not tied to one company or one industry. It keeps authorization and scope controls intact while changing industry risk questions, priority checks, and evidence focus.",
+    profileHeader: "| Profile | Description | Safe modes | Target focus |",
     evidence: "Evidence Collection",
     frontend: "Frontend Anomaly Capture",
     auth: "Authenticated Testing Rules",
@@ -295,12 +308,20 @@ function quickStartBlock() {
   return `\`\`\`bash
 npm install
 npm run catalog:generate
-npm run aegis -- init
+npm run aegis -- profiles list
+npm run aegis -- init --profile baseline_web
 npm run aegis -- scope verify
-npm run aegis -- plan --mode passive --target frontend
+npm run aegis -- plan --mode passive --target frontend --profile baseline_web
 npm run aegis -- run --target frontend --mode passive
 npm run aegis -- report --format html
 \`\`\``;
+}
+
+function profileTable(locale) {
+  const rows = listProfiles()
+    .map((profile) => `| ${profile.id} | ${profile.description} | ${profile.safe_modes.join(", ")} | ${profile.target_focus.join(", ")} |`)
+    .join("\n");
+  return `${text(locale).profileHeader}\n| --- | --- | --- | --- |\n${rows}`;
 }
 
 function dockerBlock() {
@@ -338,6 +359,12 @@ ${categoryBullets()}
 
 ${numbered(s.selectionSteps)}
 
+## ${s.trainingProfiles}
+
+${s.trainingProfilesIntro}
+
+${profileTable(locale)}
+
 ## ${s.evidence}
 
 ${s.shared.evidence}
@@ -373,6 +400,12 @@ ${quickStartBlock()}
 ## ${s.authorization}
 
 ${s.shared.authorization}
+
+## ${s.trainingProfiles}
+
+${s.trainingProfilesIntro}
+
+${profileTable(locale)}
 
 ## ${s.frontend}
 

@@ -127,6 +127,29 @@ test("help supports Korean, Japanese, Chinese, and English", async () => {
   }
 });
 
+test("training profiles list and initialize diversified scope", async () => {
+  const cwd = await tempWorkspace();
+  const list = runCli(cwd, ["profiles", "list"]);
+  assert.equal(list.status, 0, list.stderr);
+  const profiles = JSON.parse(list.stdout).profiles;
+  assert.ok(profiles.some((profile) => profile.id === "fintech_payments"));
+  assert.ok(profiles.some((profile) => profile.id === "healthcare_privacy"));
+  assert.ok(profiles.some((profile) => profile.id === "ecommerce_marketplace"));
+
+  const init = runCli(cwd, ["init", "--profile", "healthcare_privacy"]);
+  assert.equal(init.status, 0, init.stderr);
+  const scope = JSON.parse(await readFile(path.join(cwd, "aegis.scope.json"), "utf8"));
+  assert.equal(scope.training_profile.id, "healthcare_privacy");
+  assert.ok(scope.targets.frontend.denied_paths.includes("/medical-records/export/*"));
+  assert.equal(scope.safety.max_rps, 1);
+
+  const plan = runCli(cwd, ["plan", "--mode", "passive", "--target", "frontend"]);
+  assert.equal(plan.status, 0, plan.stderr);
+  const output = JSON.parse(plan.stdout);
+  assert.equal(output.training_profile.id, "healthcare_privacy");
+  assert.ok(output.selected_checks.length > 0);
+});
+
 test("version flag prints the CLI version", async () => {
   const cwd = await tempWorkspace();
   const result = runCli(cwd, ["--version"]);
