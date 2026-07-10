@@ -10,7 +10,7 @@ auditable and reproducible.
 | Aegis Security | `.github/workflows/aegis-security.yml` | CLI tests, catalog generation, scope verification, dry run, SARIF report |
 | CodeQL | `.github/workflows/codeql.yml` | JavaScript security and quality analysis in GitHub code scanning |
 | Dependency Review | `.github/workflows/dependency-review.yml` | Blocks high-severity vulnerable dependencies introduced in pull requests |
-| OpenSSF Scorecard | `.github/workflows/scorecard.yml` | Publishes open-source security posture signals |
+| OpenSSF Scorecard | `.github/workflows/scorecard.yml` | Generates open-source security posture signals and stores SARIF artifacts |
 | SBOM and Provenance | `.github/workflows/sbom.yml` | Generates CycloneDX/SPDX SBOM files and attests the CycloneDX artifact |
 | Package Provenance | `.github/workflows/package-provenance.yml` | Packs the npm artifact and creates build provenance for release tags |
 
