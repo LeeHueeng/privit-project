@@ -2,6 +2,8 @@
 
 <p align="center">
   <a href="https://github.com/LeeHueeng/privit-project/actions/workflows/aegis-security.yml"><img alt="Aegis Security" src="https://github.com/LeeHueeng/privit-project/actions/workflows/aegis-security.yml/badge.svg"></a>
+  <a href="https://github.com/LeeHueeng/privit-project/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://github.com/LeeHueeng/privit-project/actions/workflows/codeql.yml/badge.svg"></a>
+  <a href="https://github.com/LeeHueeng/privit-project/actions/workflows/scorecard.yml"><img alt="OpenSSF Scorecard" src="https://github.com/LeeHueeng/privit-project/actions/workflows/scorecard.yml/badge.svg"></a>
   <img alt="Passive by default" src="https://img.shields.io/badge/security-passive%20by%20default-0f766e">
   <img alt="Multilingual" src="https://img.shields.io/badge/i18n-ko%20%7C%20en%20%7C%20ja%20%7C%20zh-2563eb">
   <img alt="npm ready" src="https://img.shields.io/badge/npm-ready-cb3837">
@@ -44,6 +46,8 @@ artifacts.
 - SARIF output for security review systems
 - Small Node.js CLI with no runtime dependencies
 - Clean separation from the Privit workspace, so the engine can be reused
+- CodeQL, Dependency Review, OpenSSF Scorecard, SBOM generation, and provenance
+  attestations are wired into GitHub Actions
 
 ## Languages
 
@@ -170,6 +174,7 @@ aegis report --format sarif
 - Architecture: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 - Detection catalog: [`docs/DETECTION_CATALOG.md`](./docs/DETECTION_CATALOG.md)
 - Workspace integration: [`docs/WORKSPACE_INTEGRATION.md`](./docs/WORKSPACE_INTEGRATION.md)
+- Supply-chain security: [`docs/SUPPLY_CHAIN_SECURITY.md`](./docs/SUPPLY_CHAIN_SECURITY.md)
 - Release process: [`docs/RELEASE_PROCESS.md`](./docs/RELEASE_PROCESS.md)
 - Roadmap: [`docs/ROADMAP.md`](./docs/ROADMAP.md)
 

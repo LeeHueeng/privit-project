@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added CodeQL, Dependency Review, OpenSSF Scorecard, SBOM generation, and
+  provenance attestation workflows.
+- Updated GitHub Actions pins to current SHA-pinned action releases.
 - Clarified that this repository is the reusable CLI engine while
   `privit-aegis-workspace` owns the web console, Pages site, and Privit-specific
   workflow.
