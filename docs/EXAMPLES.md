@@ -13,6 +13,28 @@ npm run aegis -- scope verify
 npm run aegis -- plan --mode passive --target frontend
 ```
 
+## Plan by Industry Profile
+
+```bash
+npm run aegis -- profiles list
+npm run aegis -- profiles show fintech_payments
+npm run aegis -- init --profile healthcare_privacy
+npm run aegis -- plan --mode passive --target frontend --profile ecommerce_marketplace
+```
+
+## Plan Safe Attack Emulation
+
+These commands turn ATT&CK-style tactics into defensive validation priorities.
+They do not run exploit payloads, brute force, persistence, C2 traffic, data
+exfiltration, or destructive writes.
+
+```bash
+npm run aegis -- attacks list
+npm run aegis -- attacks show credential_access_defense
+npm run aegis -- init --attack-pack initial_access_hardening
+npm run aegis -- plan --mode passive --target frontend --attack-pack recon_exposure_review
+```
+
 ## Dry Run Without Target Requests
 
 ```bash

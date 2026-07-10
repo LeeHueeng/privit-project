@@ -1,3 +1,4 @@
+import { applyAttackPack, ATTACK_EMULATION_CATEGORY_DISTRIBUTION } from "./attackPacks.js";
 import { applyTrainingProfile } from "./profiles.js";
 
 export const VERSION = "0.1.0";
@@ -253,7 +254,8 @@ export const CATEGORY_DISTRIBUTION = [
     risk: "medium",
     standards: ["OWASP_ASVS", "NIST_SSDF"],
     examples: ["unnecessary PII in response", "masking policy", "artifact PII redaction", "report redaction"]
-  }
+  },
+  ...ATTACK_EMULATION_CATEGORY_DISTRIBUTION
 ];
 
 export const SENSITIVE_FIELDS = [
@@ -273,7 +275,7 @@ export const SENSITIVE_FIELDS = [
   "payment_card"
 ];
 
-export function createDefaultScope(projectName = "aegis-project", environment = "local", profileId) {
+export function createDefaultScope(projectName = "aegis-project", environment = "local", profileId, attackPackId) {
   const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const scope = {
@@ -331,7 +333,8 @@ export function createDefaultScope(projectName = "aegis-project", environment = 
     }
   };
 
-  return profileId ? applyTrainingProfile(scope, profileId) : scope;
+  const profiledScope = profileId ? applyTrainingProfile(scope, profileId) : scope;
+  return attackPackId ? applyAttackPack(profiledScope, attackPackId) : profiledScope;
 }
 
 export function createDefaultPolicy() {

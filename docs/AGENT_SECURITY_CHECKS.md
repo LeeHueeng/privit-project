@@ -59,6 +59,18 @@
 - logging_monitoring_error_handling: 90 checks, passive, backend_api
 - cloud_kubernetes_config_audit: 180 checks, ci, iac
 - privacy_data_minimization: 80 checks, passive, backend_api
+- attack_emulation_recon_exposure: 45 checks, passive, frontend
+- attack_emulation_initial_access: 45 checks, passive, frontend
+- attack_emulation_credential_access: 45 checks, passive, frontend
+- attack_emulation_execution_lolbin: 45 checks, ci, ci_cd
+- attack_emulation_persistence_hunting: 45 checks, ci, backend_api
+- attack_emulation_privilege_escalation: 45 checks, ci, backend_api
+- attack_emulation_defense_evasion: 45 checks, ci, backend_api
+- attack_emulation_lateral_movement: 45 checks, ci, backend_api
+- attack_emulation_collection_exfiltration: 45 checks, passive, frontend
+- attack_emulation_command_control: 45 checks, ci, ci_cd
+- attack_emulation_impact_resilience: 45 checks, passive, backend_api
+- attack_emulation_fraud_abuse: 45 checks, passive, frontend
 
 1. 검증된 scope를 불러옵니다.
 2. 대상 유형과 실행 모드로 필터링합니다.
@@ -82,6 +94,25 @@ Aegis는 하나의 회사나 한 업종에 고정되지 않습니다. 승인된 
 | internal_admin | Backoffice role separation, support tooling, audit trails, admin routes, and safe operational checks. | passive, authenticated, ci, db_audit | frontend, backend_api, database, ci_cd |
 | api_platform | OpenAPI hygiene, API keys, rate-limit metadata, developer docs, webhooks, and integration boundaries. | passive, safe_active, authenticated, ci | backend_api, frontend, ci_cd |
 | media_community | User-generated content, moderation queues, profile privacy, notification flows, and media metadata. | passive, safe_active, authenticated, ci | frontend, backend_api, ci_cd |
+
+## 안전 공격 에뮬레이션 팩
+
+공격 팩은 실제 공격 실행이 아니라 MITRE ATT&CK 전술을 방어적 검증 항목으로 바꾼 것입니다. exploit, credential theft, persistence, exfiltration, destructive behavior는 계속 차단됩니다.
+
+| 팩 | 설명 | 허용 모드 | 전술 |
+| --- | --- | --- | --- |
+| recon_exposure_review | Passive review of public discovery, metadata, sitemap, robots, API docs, and accidental admin surface exposure. | passive, ci | TA0043 Reconnaissance |
+| initial_access_hardening | Safe checks for exposed apps, phishing readiness evidence, external service policy, and supply-chain entry points. | passive, ci | TA0001 Initial Access |
+| credential_access_defense | Validate safe controls and telemetry around secret storage, token exposure, password policy, and credential-dumping detection readiness. | passive, ci, authenticated | TA0006 Credential Access |
+| execution_lolbin_detection | Review logging and detection readiness for script interpreters, scheduled execution, and living-off-the-land behavior. | ci, authenticated | TA0002 Execution |
+| persistence_hunting_readiness | Safe assessment of audit trails and configuration evidence for account manipulation, scheduled jobs, startup paths, and web shell indicators. | ci, authenticated, db_audit | TA0003 Persistence |
+| privilege_escalation_controls | Review least-privilege, privileged route boundaries, Kubernetes/container posture, and elevation audit evidence. | ci, authenticated, db_audit | TA0004 Privilege Escalation |
+| defense_evasion_telemetry | Assess detection coverage for logging gaps, tamper signals, obfuscation indicators, and unusual process or file metadata. | ci, authenticated | TA0005 Defense Evasion, TA0112 Defense Impairment |
+| lateral_movement_readiness | Review segmentation, service-account boundaries, admin surface exposure, and telemetry for lateral movement patterns. | ci, authenticated | TA0008 Lateral Movement |
+| collection_exfiltration_monitoring | Validate redaction, data minimization, export controls, DNS/object-storage telemetry, and large-transfer alert readiness. | passive, ci, db_audit | TA0009 Collection, TA0010 Exfiltration |
+| command_control_detection | Review egress controls, suspicious beacon telemetry, DNS/HTTP log readiness, and proxy policy without generating traffic. | ci, passive | TA0011 Command and Control |
+| impact_ransomware_resilience | Review backup posture, destructive-action deny paths, recovery evidence, and ransomware precursor alerting. | passive, ci, db_audit | TA0040 Impact |
+| fraud_abuse_monitoring | Safe financial-abuse review for beneficiary changes, refund abuse, account warming, and monetization telemetry. | passive, authenticated, ci | MITRE F3 Positioning, MITRE F3 Monetization |
 
 ## 증거 수집
 

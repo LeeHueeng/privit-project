@@ -1,6 +1,7 @@
 import { CATEGORY_DISTRIBUTION, EXECUTION_MODES, TOOL_ADAPTERS } from "./config.js";
 import { DEFAULT_LOCALE, localesFor, normalizeLocale, SUPPORTED_LOCALES } from "./i18n.js";
 import { writeText } from "./io.js";
+import { listAttackPacks } from "./attackPacks.js";
 import { listProfiles } from "./profiles.js";
 
 const STRINGS = {
@@ -17,6 +18,9 @@ const STRINGS = {
     trainingProfiles: "다양한 훈련 프로파일",
     trainingProfilesIntro: "Aegis는 하나의 회사나 한 업종에 고정되지 않습니다. 승인된 범위는 그대로 유지하면서 업종별 위험 질문, 우선 검사군, 증거 수집 관점을 바꿔서 사용할 수 있습니다.",
     profileHeader: "| 프로파일 | 설명 | 안전 모드 | 주요 대상 |",
+    attackPacks: "안전 공격 에뮬레이션 팩",
+    attackPacksIntro: "공격 팩은 실제 공격 실행이 아니라 MITRE ATT&CK 전술을 방어적 검증 항목으로 바꾼 것입니다. exploit, credential theft, persistence, exfiltration, destructive behavior는 계속 차단됩니다.",
+    attackPackHeader: "| 팩 | 설명 | 허용 모드 | 전술 |",
     evidence: "증거 수집",
     frontend: "프론트엔드 이상 캡처",
     auth: "인증 테스트 규칙",
@@ -84,6 +88,9 @@ const STRINGS = {
     trainingProfiles: "多様なトレーニングプロファイル",
     trainingProfilesIntro: "Aegis は 1 社または 1 業種に固定されません。承認済みスコープを維持しながら、業種別のリスク質問、優先チェック、証拠収集の観点を切り替えられます。",
     profileHeader: "| プロファイル | 説明 | 安全モード | 主な対象 |",
+    attackPacks: "安全な攻撃エミュレーションパック",
+    attackPacksIntro: "攻撃パックは実際の攻撃実行ではなく、MITRE ATT&CK の戦術を防御的な検証項目へ変換したものです。exploit、credential theft、persistence、exfiltration、destructive behavior は引き続きブロックされます。",
+    attackPackHeader: "| パック | 説明 | 許可モード | 戦術 |",
     evidence: "証拠収集",
     frontend: "フロントエンド異常キャプチャ",
     auth: "認証テストルール",
@@ -151,6 +158,9 @@ const STRINGS = {
     trainingProfiles: "多样化训练配置",
     trainingProfilesIntro: "Aegis 不绑定到单一公司或行业。在保持授权范围不变的前提下，可以切换行业风险问题、优先检查类别和证据收集视角。",
     profileHeader: "| 配置 | 说明 | 安全模式 | 主要目标 |",
+    attackPacks: "安全攻击仿真包",
+    attackPacksIntro: "攻击包不会执行真实攻击，而是把 MITRE ATT&CK 战术转换为防御性验证项。exploit、credential theft、persistence、exfiltration 和 destructive behavior 仍然被阻止。",
+    attackPackHeader: "| 包 | 说明 | 允许模式 | 战术 |",
     evidence: "证据收集",
     frontend: "前端异常捕获",
     auth: "认证测试规则",
@@ -218,6 +228,9 @@ const STRINGS = {
     trainingProfiles: "Diverse Training Profiles",
     trainingProfilesIntro: "Aegis is not tied to one company or one industry. It keeps authorization and scope controls intact while changing industry risk questions, priority checks, and evidence focus.",
     profileHeader: "| Profile | Description | Safe modes | Target focus |",
+    attackPacks: "Safe Attack Emulation Packs",
+    attackPacksIntro: "Attack packs do not execute attacks. They translate MITRE ATT&CK tactics into defensive validation checks. Exploitation, credential theft, persistence, exfiltration, and destructive behavior remain blocked.",
+    attackPackHeader: "| Pack | Description | Allowed modes | Tactics |",
     evidence: "Evidence Collection",
     frontend: "Frontend Anomaly Capture",
     auth: "Authenticated Testing Rules",
@@ -309,9 +322,10 @@ function quickStartBlock() {
 npm install
 npm run catalog:generate
 npm run aegis -- profiles list
-npm run aegis -- init --profile baseline_web
+npm run aegis -- attacks list
+npm run aegis -- init --profile baseline_web --attack-pack initial_access_hardening
 npm run aegis -- scope verify
-npm run aegis -- plan --mode passive --target frontend --profile baseline_web
+npm run aegis -- plan --mode passive --target frontend --profile baseline_web --attack-pack initial_access_hardening
 npm run aegis -- run --target frontend --mode passive
 npm run aegis -- report --format html
 \`\`\``;
@@ -322,6 +336,13 @@ function profileTable(locale) {
     .map((profile) => `| ${profile.id} | ${profile.description} | ${profile.safe_modes.join(", ")} | ${profile.target_focus.join(", ")} |`)
     .join("\n");
   return `${text(locale).profileHeader}\n| --- | --- | --- | --- |\n${rows}`;
+}
+
+function attackPackTable(locale) {
+  const rows = listAttackPacks()
+    .map((pack) => `| ${pack.id} | ${pack.description} | ${pack.allowed_modes.join(", ")} | ${pack.tactics.join(", ")} |`)
+    .join("\n");
+  return `${text(locale).attackPackHeader}\n| --- | --- | --- | --- |\n${rows}`;
 }
 
 function dockerBlock() {
@@ -365,6 +386,12 @@ ${s.trainingProfilesIntro}
 
 ${profileTable(locale)}
 
+## ${s.attackPacks}
+
+${s.attackPacksIntro}
+
+${attackPackTable(locale)}
+
 ## ${s.evidence}
 
 ${s.shared.evidence}
@@ -406,6 +433,12 @@ ${s.shared.authorization}
 ${s.trainingProfilesIntro}
 
 ${profileTable(locale)}
+
+## ${s.attackPacks}
+
+${s.attackPacksIntro}
+
+${attackPackTable(locale)}
 
 ## ${s.frontend}
 

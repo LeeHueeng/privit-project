@@ -40,7 +40,7 @@ artifacts.
 ## Why Star It
 
 - Passive and scope-guarded by default
-- 2,430 generated safe verification checks
+- 2,970 generated safe verification checks
 - Korean, English, Japanese, and Chinese CLI/docs support
 - Redacted evidence and report generation built in
 - SARIF output for security review systems
@@ -74,9 +74,10 @@ Localized docs are generated under:
 npm install
 npm run catalog:generate
 npm run aegis -- profiles list
-npm run aegis -- init --profile baseline_web
+npm run aegis -- attacks list
+npm run aegis -- init --profile baseline_web --attack-pack initial_access_hardening
 npm run aegis -- scope verify
-npm run aegis -- plan --mode passive --target frontend --profile baseline_web
+npm run aegis -- plan --mode passive --target frontend --profile baseline_web --attack-pack initial_access_hardening
 npm run aegis -- run --target frontend --mode passive --dry-run
 npm run aegis -- report --format html
 ```
@@ -106,6 +107,39 @@ Current profiles include:
 - `api_platform`: OpenAPI, API key, webhook, integration, and developer portal coverage
 - `media_community`: user-generated content, moderation, profile, and media metadata coverage
 
+## Safe Attack Emulation Packs
+
+Inspired by the ATT&CK-mapped structure of
+[`mukul975/Anthropic-Cybersecurity-Skills`](https://github.com/mukul975/Anthropic-Cybersecurity-Skills),
+Aegis includes safe attack emulation packs. They do not execute attacks. They
+translate adversary tactics into defensive validation checks, evidence
+requirements, denied-action lists, and safe planning metadata.
+
+```bash
+npm run aegis -- attacks list
+npm run aegis -- attacks show credential_access_defense
+npm run aegis -- plan --mode passive --target frontend --attack-pack recon_exposure_review
+```
+
+Current safe packs include:
+
+- `recon_exposure_review`
+- `initial_access_hardening`
+- `credential_access_defense`
+- `execution_lolbin_detection`
+- `persistence_hunting_readiness`
+- `privilege_escalation_controls`
+- `defense_evasion_telemetry`
+- `lateral_movement_readiness`
+- `collection_exfiltration_monitoring`
+- `command_control_detection`
+- `impact_ransomware_resilience`
+- `fraud_abuse_monitoring`
+
+Blocked by design: exploit payloads, phishing delivery, password guessing,
+credential dumping, persistence creation, C2 traffic, data exfiltration, and
+destructive write activity.
+
 Install directly from GitHub after this repository is public:
 
 ```bash
@@ -123,10 +157,12 @@ published to npm yet.
 | Create starter files | `aegis init --profile baseline_web` |
 | List training profiles | `aegis profiles list` |
 | Inspect a profile | `aegis profiles show saas_b2b` |
+| List safe attack packs | `aegis attacks list` |
+| Inspect an attack pack | `aegis attacks show credential_access_defense` |
 | Verify authorization and allowlists | `aegis scope verify` |
 | Rebuild the safe check catalog | `aegis catalog generate` |
 | Generate multilingual guides | `aegis docs generate --lang all` |
-| Plan passive frontend checks | `aegis plan --mode passive --target frontend --profile saas_b2b` |
+| Plan passive frontend checks | `aegis plan --mode passive --target frontend --profile saas_b2b --attack-pack initial_access_hardening` |
 | Execute a dry run | `aegis run --mode passive --target frontend --dry-run` |
 | List findings | `aegis findings list` |
 | Build a human report | `aegis report --format html` |
@@ -171,6 +207,8 @@ two-repository workflow.
 aegis init
 aegis profiles list
 aegis profiles show saas_b2b
+aegis attacks list
+aegis attacks show credential_access_defense
 aegis scope verify
 aegis catalog generate
 aegis docs generate --lang all
@@ -178,7 +216,7 @@ aegis docs generate --lang ko-KR
 aegis docs generate --lang ja-JP
 aegis docs generate --lang zh-CN
 aegis docs generate --lang en-US
-aegis plan --mode passive --target frontend --profile saas_b2b
+aegis plan --mode passive --target frontend --profile saas_b2b --attack-pack initial_access_hardening
 aegis run --mode passive --target frontend --dry-run
 aegis findings list
 aegis report --format markdown
@@ -192,7 +230,7 @@ aegis report --format sarif
 - `aegis.policy.json`: blocked behavior and tool-adapter policy.
 - `aegis.auth.json`: test-account metadata only.
 - `aegis.plan.json`: selected safe checks for a run.
-- `catalog/security-checks.jsonl`: 2,430 generated safe verification checks.
+- `catalog/security-checks.jsonl`: 2,970 generated safe verification checks.
 - `docs/AGENT_SECURITY_CHECKS.md`: agent and adapter operating guide.
 - `docs/HUMAN_SECURITY_GUIDE.md`: human usage guide.
 - `docs/{ko-KR,ja-JP,zh-CN,en-US}/`: localized agent and human guides.
@@ -203,6 +241,7 @@ aegis report --format sarif
 - Examples: [`docs/EXAMPLES.md`](./docs/EXAMPLES.md)
 - Architecture: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 - Detection catalog: [`docs/DETECTION_CATALOG.md`](./docs/DETECTION_CATALOG.md)
+- Safe attack emulation: [`docs/ATTACK_EMULATION.md`](./docs/ATTACK_EMULATION.md)
 - Workspace integration: [`docs/WORKSPACE_INTEGRATION.md`](./docs/WORKSPACE_INTEGRATION.md)
 - Supply-chain security: [`docs/SUPPLY_CHAIN_SECURITY.md`](./docs/SUPPLY_CHAIN_SECURITY.md)
 - Release process: [`docs/RELEASE_PROCESS.md`](./docs/RELEASE_PROCESS.md)
