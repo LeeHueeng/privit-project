@@ -1,7 +1,8 @@
 # Detection Catalog
 
-The generated catalog contains 2,430 safe verification checks across frontend,
-backend API, database audit, and CI/CD categories.
+The generated catalog contains 2,970 safe verification checks across frontend,
+backend API, database audit, CI/CD, industry profile, and attack emulation
+categories.
 
 ## Category Examples
 
@@ -10,6 +11,7 @@ backend API, database audit, and CI/CD categories.
 - API schema and authorization review
 - Database read-only audit posture
 - CI/CD secret release and supply-chain checks
+- Safe attack emulation checks mapped to defensive ATT&CK-style objectives
 
 ## Check Shape
 

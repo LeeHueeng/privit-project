@@ -15,7 +15,11 @@
     "i18n",
     "sarif",
     "redaction",
-    "authorized-testing"
+    "authorized-testing",
+    "mitre-attack",
+    "attack-emulation",
+    "defensive-security",
+    "security-scanner"
   ],
   "repository": {
     "type": "git",

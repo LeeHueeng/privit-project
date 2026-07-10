@@ -1,6 +1,7 @@
 import path from "node:path";
 import { loadCatalog, selectChecks } from "./catalog.js";
 import { readJson, writeJson } from "./io.js";
+import { getAttackPack } from "./attackPacks.js";
 import { getProfile } from "./profiles.js";
 import { loadScope, verifyScope } from "./scope.js";
 
@@ -16,13 +17,18 @@ export async function createPlan(cwd, options = {}) {
   if (profileId && !profile) {
     throw new Error(`Unknown training profile: ${profileId}`);
   }
+  const attackPackId = options.attackPack || scope.attack_emulation?.id;
+  const attackPack = getAttackPack(attackPackId);
+  if (attackPackId && !attackPack) {
+    throw new Error(`Unknown attack emulation pack: ${attackPackId}`);
+  }
   const catalog = await loadCatalog(cwd, options.catalogFile);
   const checks = selectChecks(catalog, {
     mode,
     target,
     includeManualApproval: manualApproval,
     limit,
-    priorityCategories: profile?.priority_categories || []
+    priorityCategories: [...(attackPack?.priority_categories || []), ...(profile?.priority_categories || [])]
   });
 
   const plan = {
@@ -41,6 +47,18 @@ export async function createPlan(cwd, options = {}) {
           risk_questions: profile.risk_questions
         }
       : scope.training_profile,
+    attack_emulation: attackPack
+      ? {
+          id: attackPack.id,
+          label: attackPack.label,
+          description: attackPack.description,
+          tactics: attackPack.tactics,
+          techniques: attackPack.techniques,
+          priority_categories: attackPack.priority_categories,
+          evidence_focus: attackPack.evidence_focus,
+          blocked_actions: attackPack.blocked_actions
+        }
+      : scope.attack_emulation,
     generated_at: new Date().toISOString(),
     safety: {
       max_rps: scope.safety?.max_rps ?? 2,

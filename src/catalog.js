@@ -16,6 +16,9 @@ function titleCase(value) {
 }
 
 function evidenceForCategory(category) {
+  if (category.includes("attack_emulation")) {
+    return ["control_evidence", "log_metadata", "configuration_snapshot", "redacted_sample"];
+  }
   if (category.includes("frontend")) {
     return ["screenshot", "console_log", "dom_snapshot", "response_metadata"];
   }

@@ -6,6 +6,7 @@ import { writeDocs } from "./docs.js";
 import { resolveLocale, t, usage } from "./i18n.js";
 import { fileExists, readJson, writeJson } from "./io.js";
 import { createPlan } from "./planner.js";
+import { getAttackPack, listAttackPacks } from "./attackPacks.js";
 import { getProfile, listProfiles } from "./profiles.js";
 import { generateReport } from "./reports.js";
 import { listFindings, runPlan, showFinding } from "./runner.js";
@@ -35,7 +36,7 @@ async function initProject(cwd, flags, locale) {
     outputs.push({ file: relativePath, status: "written" });
   }
 
-  await writeOnce("aegis.scope.json", createDefaultScope(projectName, environment, flags.profile));
+  await writeOnce("aegis.scope.json", createDefaultScope(projectName, environment, flags.profile, flags["attack-pack"]));
   await writeOnce("aegis.policy.json", createDefaultPolicy());
   await writeOnce("aegis.auth.json", {
     version: "0.1.0",
@@ -120,6 +121,20 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
     return;
   }
 
+  if (command === "attacks" && subcommand === "list") {
+    print({ attack_packs: listAttackPacks() });
+    return;
+  }
+
+  if (command === "attacks" && subcommand === "show") {
+    const attackPack = getAttackPack(third);
+    if (!attackPack) {
+      throw new Error(`Unknown attack emulation pack: ${third}`);
+    }
+    print(attackPack);
+    return;
+  }
+
   if (command === "auth" && subcommand === "add") {
     print(await addAuthRole(cwd, flags, locale));
     return;
@@ -143,6 +158,7 @@ export async function main(argv = process.argv, cwd = process.cwd()) {
       mode: flags.mode || "passive",
       target: flags.target,
       profile: flags.profile,
+      attackPack: flags["attack-pack"],
       limit: numberFlag(flags, "limit", 100),
       manualApproval: boolFlag(flags, "manual-approval", false)
     }));

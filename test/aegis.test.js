@@ -150,6 +150,34 @@ test("training profiles list and initialize diversified scope", async () => {
   assert.ok(output.selected_checks.length > 0);
 });
 
+test("safe attack packs list and plan defensive emulation", async () => {
+  const cwd = await tempWorkspace();
+  const list = runCli(cwd, ["attacks", "list"]);
+  assert.equal(list.status, 0, list.stderr);
+  const packs = JSON.parse(list.stdout).attack_packs;
+  assert.ok(packs.some((pack) => pack.id === "credential_access_defense"));
+  assert.ok(packs.some((pack) => pack.id === "collection_exfiltration_monitoring"));
+
+  const show = runCli(cwd, ["attacks", "show", "credential_access_defense"]);
+  assert.equal(show.status, 0, show.stderr);
+  const pack = JSON.parse(show.stdout);
+  assert.ok(pack.blocked_actions.includes("credential dumping"));
+
+  const init = runCli(cwd, ["init", "--attack-pack", "credential_access_defense"]);
+  assert.equal(init.status, 0, init.stderr);
+  const scope = JSON.parse(await readFile(path.join(cwd, "aegis.scope.json"), "utf8"));
+  assert.equal(scope.attack_emulation.id, "credential_access_defense");
+  assert.equal(scope.safety.brute_force, false);
+  assert.equal(scope.safety.data_exfiltration, false);
+
+  const plan = runCli(cwd, ["plan", "--mode", "passive", "--target", "frontend", "--attack-pack", "credential_access_defense"]);
+  assert.equal(plan.status, 0, plan.stderr);
+  const output = JSON.parse(plan.stdout);
+  assert.equal(output.attack_emulation.id, "credential_access_defense");
+  assert.ok(output.attack_emulation.blocked_actions.includes("password guessing"));
+  assert.ok(output.selected_checks.some((check) => check.category === "attack_emulation_credential_access"));
+});
+
 test("version flag prints the CLI version", async () => {
   const cwd = await tempWorkspace();
   const result = runCli(cwd, ["--version"]);
